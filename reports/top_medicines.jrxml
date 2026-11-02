@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="top_medicines" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenNoDataType="AllSectionsNoDetail">
+<style name="Zebra" mode="Opaque" backcolor="#FFFFFF"><conditionalStyle><conditionExpression><![CDATA[$V{REPORT_COUNT}%2==0]]></conditionExpression><style backcolor="#EEF4F0"/></conditionalStyle></style>
+<parameter name="SHOP_NAME" class="java.lang.String"><defaultValueExpression><![CDATA["Golden Chemist Pharmacy"]]></defaultValueExpression></parameter>
+<parameter name="FROM_DATE" class="java.sql.Date"/>
+<parameter name="TO_DATE" class="java.sql.Date"/>
+<queryString><![CDATA[
+SELECT CONCAT(m.brand_name, IFNULL(CONCAT(' ', m.strength), '')) AS medicine,
+       COALESCE(m.dosage_form, '') AS dosage_form,
+       CAST(SUM(si.quantity) AS SIGNED) AS qty_sold,
+       SUM(si.line_total) AS revenue
+FROM sale_item si JOIN sale s ON s.sale_id = si.sale_id
+JOIN medicine m ON m.medicine_id = si.medicine_id
+WHERE s.status = 'COMPLETED' AND DATE(s.sale_date) BETWEEN $P{FROM_DATE} AND $P{TO_DATE}
+GROUP BY m.medicine_id, m.brand_name, m.strength, m.dosage_form
+ORDER BY qty_sold DESC, revenue DESC LIMIT 25]]></queryString>
+<field name="medicine" class="java.lang.String"/>
+<field name="dosage_form" class="java.lang.String"/>
+<field name="qty_sold" class="java.lang.Long"/>
+<field name="revenue" class="java.math.BigDecimal"/>
+<variable name="SUM_0" class="java.lang.Long" calculation="Sum"><variableExpression><![CDATA[$F{qty_sold}]]></variableExpression></variable>
+<variable name="SUM_1" class="java.math.BigDecimal" calculation="Sum"><variableExpression><![CDATA[$F{revenue}]]></variableExpression></variable>
+<title><band height="62">
+<rectangle><reportElement x="0" y="0" width="555" height="6" backcolor="#C9A227" forecolor="#C9A227"/></rectangle>
+<textField isBlankWhenNull="true"><reportElement x="0" y="10" width="555" height="24" forecolor="#0F5C3A"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="16" isBold="true"/></textElement><textFieldExpression class="java.lang.String"><![CDATA[$P{SHOP_NAME}]]></textFieldExpression></textField>
+<staticText><reportElement x="0" y="34" width="555" height="16" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="12" isBold="true"/></textElement><text><![CDATA[Top Selling Medicines]]></text></staticText>
+<textField isBlankWhenNull="true"><reportElement x="0" y="48" width="555" height="14" forecolor="#555555"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="false"/></textElement><textFieldExpression class="java.lang.String"><![CDATA["Period: " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{FROM_DATE}) + "  to  " + new java.text.SimpleDateFormat("yyyy-MM-dd").format($P{TO_DATE})]]></textFieldExpression></textField>
+</band></title>
+<columnHeader><band height="22">
+<staticText><reportElement x="0" y="0" width="265" height="22" mode="Opaque" backcolor="#0F5C3A" forecolor="#FFFFFF"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Medicine]]></text></staticText>
+<staticText><reportElement x="265" y="0" width="100" height="22" mode="Opaque" backcolor="#0F5C3A" forecolor="#FFFFFF"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Form]]></text></staticText>
+<staticText><reportElement x="365" y="0" width="90" height="22" mode="Opaque" backcolor="#0F5C3A" forecolor="#FFFFFF"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Units sold]]></text></staticText>
+<staticText><reportElement x="455" y="0" width="100" height="22" mode="Opaque" backcolor="#0F5C3A" forecolor="#FFFFFF"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Revenue]]></text></staticText>
+</band></columnHeader>
+<detail><band height="20">
+<textField isBlankWhenNull="true"><reportElement x="0" y="0" width="265" height="20" style="Zebra" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="false"/></textElement><textFieldExpression class="java.lang.String"><![CDATA[$F{medicine}]]></textFieldExpression></textField>
+<textField isBlankWhenNull="true"><reportElement x="265" y="0" width="100" height="20" style="Zebra" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="false"/></textElement><textFieldExpression class="java.lang.String"><![CDATA[$F{dosage_form}]]></textFieldExpression></textField>
+<textField pattern="#,##0" isBlankWhenNull="true"><reportElement x="365" y="0" width="90" height="20" style="Zebra" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="false"/></textElement><textFieldExpression class="java.lang.Long"><![CDATA[$F{qty_sold}]]></textFieldExpression></textField>
+<textField pattern="#,##0.00" isBlankWhenNull="true"><reportElement x="455" y="0" width="100" height="20" style="Zebra" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="false"/></textElement><textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{revenue}]]></textFieldExpression></textField>
+</band></detail>
+<pageFooter><band height="20">
+<textField isBlankWhenNull="true"><reportElement x="0" y="3" width="300" height="14" forecolor="#777777"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="false"/></textElement><textFieldExpression class="java.lang.String"><![CDATA["Printed " + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(new java.util.Date())]]></textFieldExpression></textField>
+<textField isBlankWhenNull="true"><reportElement x="435" y="3" width="120" height="14" forecolor="#777777"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="false"/></textElement><textFieldExpression class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression></textField>
+</band></pageFooter>
+<summary><band height="66">
+<line><reportElement x="0" y="4" width="555" height="1" forecolor="#0F5C3A"/></line>
+<staticText><reportElement x="0" y="8" width="415" height="18" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Total units]]></text></staticText>
+<textField pattern="#,##0" isBlankWhenNull="true"><reportElement x="415" y="8" width="140" height="18" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><textFieldExpression class="java.lang.Long"><![CDATA[$V{SUM_0}]]></textFieldExpression></textField>
+<staticText><reportElement x="0" y="26" width="415" height="18" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Total revenue]]></text></staticText>
+<textField pattern="#,##0.00" isBlankWhenNull="true"><reportElement x="415" y="26" width="140" height="18" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{SUM_1}]]></textFieldExpression></textField>
+</band></summary>
+<noData><band height="40"><staticText><reportElement x="0" y="10" width="555" height="20" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[No records found for this report.]]></text></staticText></band></noData>
+</jasperReport>

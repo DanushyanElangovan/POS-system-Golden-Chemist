@@ -1,0 +1,26 @@
+# ---------------------------------------------------------------
+#  Golden Chemist Pharmacy POS - configuration
+# ---------------------------------------------------------------
+
+# Database (MySQL 5.7 / 8.x or MariaDB 10.x)
+db.url=jdbc:mysql://localhost:3306/golden_chemist_pos?useSSL=false&allowPublicKeyRetrieval=true
+db.user=root
+db.password=
+
+# Shop details printed on invoices and reports  (edit these)
+shop.name=Golden Chemist Pharmacy
+shop.address=No. 00, Main Street, Your Town, Sri Lanka
+shop.phone=+94 00 000 0000
+shop.regNo=
+
+# Currency symbol used on screen
+currency.symbol=Rs.
+
+# Folder that holds the Jasper report templates (.jrxml)
+reports.dir=reports
+
+# Inventory rules
+stock.expiry.warning.days=60
+
+# Cashiers may give at most this percentage discount on one invoice
+cashier.max.discount.percent=10

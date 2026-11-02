@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="low_stock" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenNoDataType="AllSectionsNoDetail">
+<style name="Zebra" mode="Opaque" backcolor="#FFFFFF"><conditionalStyle><conditionExpression><![CDATA[$V{REPORT_COUNT}%2==0]]></conditionExpression><style backcolor="#EEF4F0"/></conditionalStyle></style>
+<parameter name="SHOP_NAME" class="java.lang.String"><defaultValueExpression><![CDATA["Golden Chemist Pharmacy"]]></defaultValueExpression></parameter>
+<queryString><![CDATA[
+SELECT m.barcode, CONCAT(m.brand_name, IFNULL(CONCAT(' ', m.strength), '')) AS medicine,
+       COALESCE(c.name, '-') AS category, m.reorder_level,
+       CAST(COALESCE(SUM(b.quantity), 0) AS SIGNED) AS stock
+FROM medicine m LEFT JOIN category c ON c.category_id = m.category_id
+LEFT JOIN batch b ON b.medicine_id = m.medicine_id AND b.expiry_date >= CURDATE()
+WHERE m.active = 1
+GROUP BY m.medicine_id, m.barcode, m.brand_name, m.strength, c.name, m.reorder_level
+HAVING COALESCE(SUM(b.quantity), 0) <= m.reorder_level
+ORDER BY stock, medicine]]></queryString>
+<field name="barcode" class="java.lang.String"/>
+<field name="medicine" class="java.lang.String"/>
+<field name="category" class="java.lang.String"/>
+<field name="reorder_level" class="java.lang.Integer"/>
+<field name="stock" class="java.lang.Long"/>
+<title><band height="62">
+<rectangle><reportElement x="0" y="0" width="555" height="6" backcolor="#C9A227" forecolor="#C9A227"/></rectangle>
+<textField isBlankWhenNull="true"><reportElement x="0" y="10" width="555" height="24" forecolor="#0F5C3A"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="16" isBold="true"/></textElement><textFieldExpression class="java.lang.String"><![CDATA[$P{SHOP_NAME}]]></textFieldExpression></textField>
+<staticText><reportElement x="0" y="34" width="555" height="16" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="12" isBold="true"/></textElement><text><![CDATA[Low Stock / Reorder List]]></text></staticText>
+</band></title>
+<columnHeader><band height="22">
+<staticText><reportElement x="0" y="0" width="105" height="22" mode="Opaque" backcolor="#0F5C3A" forecolor="#FFFFFF"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Barcode]]></text></staticText>
+<staticText><reportElement x="105" y="0" width="200" height="22" mode="Opaque" backcolor="#0F5C3A" forecolor="#FFFFFF"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Medicine]]></text></staticText>
+<staticText><reportElement x="305" y="0" width="120" height="22" mode="Opaque" backcolor="#0F5C3A" forecolor="#FFFFFF"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Category]]></text></staticText>
+<staticText><reportElement x="425" y="0" width="65" height="22" mode="Opaque" backcolor="#0F5C3A" forecolor="#FFFFFF"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Reorder at]]></text></staticText>
+<staticText><reportElement x="490" y="0" width="65" height="22" mode="Opaque" backcolor="#0F5C3A" forecolor="#FFFFFF"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[In stock]]></text></staticText>
+</band></columnHeader>
+<detail><band height="20">
+<textField isBlankWhenNull="true"><reportElement x="0" y="0" width="105" height="20" style="Zebra" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="false"/></textElement><textFieldExpression class="java.lang.String"><![CDATA[$F{barcode}]]></textFieldExpression></textField>
+<textField isBlankWhenNull="true"><reportElement x="105" y="0" width="200" height="20" style="Zebra" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="false"/></textElement><textFieldExpression class="java.lang.String"><![CDATA[$F{medicine}]]></textFieldExpression></textField>
+<textField isBlankWhenNull="true"><reportElement x="305" y="0" width="120" height="20" style="Zebra" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="false"/></textElement><textFieldExpression class="java.lang.String"><![CDATA[$F{category}]]></textFieldExpression></textField>
+<textField pattern="#,##0" isBlankWhenNull="true"><reportElement x="425" y="0" width="65" height="20" style="Zebra" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="false"/></textElement><textFieldExpression class="java.lang.Integer"><![CDATA[$F{reorder_level}]]></textFieldExpression></textField>
+<textField pattern="#,##0" isBlankWhenNull="true"><reportElement x="490" y="0" width="65" height="20" style="Zebra" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="false"/></textElement><textFieldExpression class="java.lang.Long"><![CDATA[$F{stock}]]></textFieldExpression></textField>
+</band></detail>
+<pageFooter><band height="20">
+<textField isBlankWhenNull="true"><reportElement x="0" y="3" width="300" height="14" forecolor="#777777"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="false"/></textElement><textFieldExpression class="java.lang.String"><![CDATA["Printed " + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(new java.util.Date())]]></textFieldExpression></textField>
+<textField isBlankWhenNull="true"><reportElement x="435" y="3" width="120" height="14" forecolor="#777777"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="false"/></textElement><textFieldExpression class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression></textField>
+</band></pageFooter>
+<summary><band height="48">
+<line><reportElement x="0" y="4" width="555" height="1" forecolor="#0F5C3A"/></line>
+<staticText><reportElement x="0" y="8" width="415" height="18" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[Items to reorder]]></text></staticText>
+<textField pattern="#,##0" isBlankWhenNull="true"><reportElement x="415" y="8" width="140" height="18" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><textFieldExpression class="java.lang.Integer"><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression></textField>
+</band></summary>
+<noData><band height="40"><staticText><reportElement x="0" y="10" width="555" height="20" forecolor="#222222"/><box leftPadding="3" rightPadding="3"/><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement><text><![CDATA[No records found for this report.]]></text></staticText></band></noData>
+</jasperReport>

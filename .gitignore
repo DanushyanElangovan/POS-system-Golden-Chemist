@@ -1,0 +1,4 @@
+out/
+out-test/
+reports/compiled/
+config/app.properties
